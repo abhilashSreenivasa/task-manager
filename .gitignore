@@ -11,7 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
-
+Task Project.postman_collection
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
