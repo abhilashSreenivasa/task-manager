@@ -21,19 +21,20 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
   const [assignQueue, setAssignQueue] = useState(false);
 
   const handleSubmit = () => {
-    if (!selectedClient || !selectedOwner || !selectedTaskType) return;
+  onCreate({
+    PersonId: selectedClient.id,
+    clientName: selectedClient.name,
+    OwnerId: selectedOwner.id,
+    ownerName: selectedOwner.name,
+    TaskType: selectedTaskType,
+    Description: description,
+    IsUrgent: urgent,
+    IsAssignedToQueue: assignQueue,
+  });
 
-    onCreate({
-      PersonId: selectedClient.id,
-      OwnerId: selectedOwner.id,
-      TaskType: selectedTaskType,
-      Description: description,
-      IsUrgent: urgent,
-      IsAssignedToQueue: assignQueue,
-    });
+  onClose();
+};
 
-    onClose();
-  };
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
