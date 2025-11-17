@@ -14,7 +14,7 @@ export async function createTask(data: any) {
   const newTask = {
     id: idCounter,
     taskName: `T-${String(idCounter).padStart(5, "0")}`,
-    status: "Requested",
+    status: "Allocated",
 
     description: data.Description || "",
     taskType: data.TaskType || "",

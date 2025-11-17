@@ -1,66 +1,62 @@
-// src/components/task/StatusTimeline.tsx
-import {STEP_ORDER}  from "../../constants/statusus";
+import { CheckIcon } from "@heroicons/react/24/outline";
+import { STEPS } from "../../constants/steps";
 
 interface Props {
   status: string;
 }
 
-export default function StatusTimeline({ status }: Props) {
-  // Determine which steps are "completed"
-  const currentIndex = STEP_ORDER.indexOf(status);
-
-  // If status is Completed, everything is done
-  const isCompleted = status === "Completed";
-
-  // If Cancelled → show only a cancelled banner
-  if (status === "Cancelled") {
-    return (
-      <div className="bg-red-100 border border-red-300 p-4 rounded text-red-700 text-center font-medium mb-6">
-        Task Cancelled
-      </div>
-    );
-  }
+export default function StatusSteps({ status }: Props) {
+  const currentIndex = STEPS.indexOf(status);
 
   return (
-    <div className="bg-white shadow p-6 rounded mb-6">
-      <h2 className="font-semibold mb-4">Status</h2>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex justify-center items-center gap-6 p-6">
 
-        {STEP_ORDER.map((step, index) => {
-          const done =
-            isCompleted || index <= currentIndex;
+        {STEPS.map((label, index) => {
+          const isDone = index < currentIndex;
+          const isCurrent = index === currentIndex;
 
           return (
-            <div key={step} className="flex items-center gap-3">
-
-              {/* Dot */}
+            <div key={label} className="flex items-center gap-6">
+              {/* CIRCLE */}
               <div
                 className={`
-                  h-4 w-4 rounded-full border
-                  ${done ? "bg-green-600 border-green-700" : "bg-gray-300 border-gray-400"}
+                  h-8 w-8 flex items-center justify-center rounded-full border 
+                  text-sm font-semibold 
+                  ${
+                    isDone
+                      ? "bg-green-500 text-white border-green-600"
+                      : isCurrent
+                      ? "bg-green-800 text-white border-green-900"
+                      : "bg-gray-200 text-gray-700 border-gray-400"
+                  }
                 `}
-              />
-
-              {/* Line */}
-              <div
-                className={`
-                  flex-1 h-[2px]
-                  ${index < STEP_ORDER.length - 1
-                    ? done ? "bg-green-600" : "bg-gray-300"
-                    : ""}
-                `}
-              />
+              >
+                {isDone ? (
+                  <CheckIcon className="h-5 w-5 text-white" />
+                ) : (
+                  index + 1
+                )}
+              </div>
 
               {/* Label */}
-              <span className={done ? "text-green-700 font-medium" : "text-gray-600"}>
-                {step}
+              <span
+                className={`
+                  text-sm
+                  ${isCurrent ? "font-semibold text-green-800" : "text-gray-600"}
+                `}
+              >
+                {label}
               </span>
 
+              {/* Arrow > (except last) */}
+              {index < STEPS.length - 1 && (
+                <span className="text-gray-400 text-lg">›</span>
+              )}
             </div>
           );
         })}
+
       </div>
-    </div>
   );
 }
