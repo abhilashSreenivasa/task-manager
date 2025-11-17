@@ -1,3 +1,11 @@
+export interface TaskNote {
+  id: number;
+  body: string;
+  author: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Task {
   id: number;
   taskName: string;
@@ -16,9 +24,12 @@ export interface Task {
   isAssignedToQueue: boolean;
 
   dateCreated: string;
+  lastUpdated?: string;
 
+  // next action fields
   nextActionDate?: string;
   nextActionNotes?: string;
 
-  lastUpdated?: string; 
+  // activity pane
+  notes: TaskNote[];
 }

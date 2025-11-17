@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { getTaskList, createTask } from "../services/taskService.mock";
+import { getTaskList, createTask,updateTask } from "../services/taskService.mock";
 import type { Task } from "../types/Task";
 
 type TaskContextType = {
@@ -8,6 +8,13 @@ type TaskContextType = {
   error: string | null;
   fetchTasks: () => Promise<void>;
   createNewTask: (taskData: any) => Promise<void>;
+  addNote: (taskId: number, body: string) => void;
+   recordUpdate: (
+    taskId: number,
+    status: string,
+    nextActionDate: string,
+    nextActionNotes: string
+  ) => void;  
 };
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -42,6 +49,53 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     }
   };
+  const addNote = (taskId: number, body: string) => {
+  setTasks((prev) =>
+    prev.map((t) =>
+      t.id === taskId
+        ? {
+            ...t,
+            notes: [
+              ...t.notes,
+              {
+                id: Date.now(),
+                body,
+                author: t.ownerName || "Owner",
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              },
+            ],
+            lastUpdated: new Date().toISOString(),
+          }
+        : t
+    )
+  );
+};
+
+
+const recordUpdate = (
+  taskId: number,
+  status: string,
+  nextActionDate: string,
+  nextActionNotes: string
+) => {
+  setTasks((prev) =>
+    prev.map((t) =>
+      t.id === taskId
+        ? {
+            ...t,
+            status,
+            nextActionDate,
+            nextActionNotes,
+            lastUpdated: new Date().toISOString(),
+          }
+        : t
+    )
+  );
+};
+
+
+  
 
   return (
     <TaskContext.Provider
@@ -51,6 +105,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
         error,
         fetchTasks,
         createNewTask,
+        addNote,
+        recordUpdate,
       }}
     >
       {children}

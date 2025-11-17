@@ -32,6 +32,7 @@ export async function createTask(data: any) {
     nextActionDate: new Date().toISOString(),
     nextActionNotes: "",
     lastUpdated: "",
+    notes: [],
   };
 
   idCounter++;
@@ -47,11 +48,38 @@ export async function getTaskById(id: number) {
 }
 
 export async function updateTask(id: number, updates: any) {
-  mockTasks = mockTasks.map((t) =>
-    t.id === id ? { ...t, ...updates } : t
-  );
+  let updated: any = null;
 
-  return {
-    data: mockTasks.find((t) => t.id === id),
-  };
+  mockTasks = mockTasks.map((t) => {
+    if (t.id === id) {
+      updated = {
+        ...t,
+        ...updates,
+        lastUpdated: new Date().toISOString(),
+        notes: updates.notes || t.notes, 
+      };
+      return updated;
+    }
+    return t;
+  });
+
+  return { data: updated };
 }
+
+export async function addNote(taskId: number, body: string, author: string) {
+  const task = mockTasks.find((t) => t.id === taskId);
+  if (!task) return { data: null };
+
+  const newNote = {
+    id: task.notes.length + 1,
+    body,
+    author,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  task.notes.push(newNote);
+
+  return { data: newNote };
+}
+
