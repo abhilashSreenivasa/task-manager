@@ -88,8 +88,8 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
                     <label className="block text-sm font-medium mb-1">Client</label>
                     <Listbox value={selectedClient} onChange={setSelectedClient}>
                       <div className="relative">
-                        <ListboxButton className="w-full border rounded px-3 py-2 flex justify-between items-center text-left">
-                          <span>{selectedClient.name}</span>
+                        <ListboxButton className="w-full border border rounded px-3 py-2 flex justify-between items-center text-left">
+                          <span className="text-[grey]">{selectedClient.name}</span>
                           <ChevronUpDownIcon className="h-5 w-5 text-gray-500" />
                         </ListboxButton>
                         <ListboxOptions className="absolute z-10 mt-1 w-full bg-white rounded border shadow">
@@ -101,7 +101,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
                             >
                               {({ selected }) => (
                                 <>
-                                  <span>{client.name}</span>
+                                  <span className="text-[grey]">{client.name}</span>
                                   {selected && <CheckIcon className="h-4 w-4 text-green-600" />}
                                 </>
                               )}
@@ -118,7 +118,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
                     <Listbox value={selectedOwner} onChange={setSelectedOwner}>
                       <div className="relative">
                         <ListboxButton className="w-full border rounded px-3 py-2 flex justify-between items-center text-left">
-                          <span>{selectedOwner.name}</span>
+                          <span className="text-[grey]">{selectedOwner.name}</span>
                           <ChevronUpDownIcon className="h-5 w-5 text-gray-500" />
                         </ListboxButton>
                         <ListboxOptions className="absolute z-10 mt-1 w-full bg-white rounded border shadow">
@@ -130,7 +130,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
                             >
                               {({ selected }) => (
                                 <>
-                                  <span>{owner.name}</span>
+                                  <span className="text-[grey]">{owner.name}</span>
                                   {selected && <CheckIcon className="h-4 w-4 text-green-600" />}
                                 </>
                               )}
@@ -147,10 +147,10 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
                     <Listbox value={selectedTaskType} onChange={setSelectedTaskType}>
                       <div className="relative">
                         <ListboxButton className="w-full border rounded px-3 py-2 flex justify-between items-center text-left">
-                          <span>{selectedTaskType}</span>
+                          <span className="text-[grey]">{selectedTaskType}</span>
                           <ChevronUpDownIcon className="h-5 w-5 text-gray-500" />
                         </ListboxButton>
-                        <ListboxOptions className="absolute z-10 mt-1 w-full bg-white rounded border shadow max-h-60 overflow-y-auto">
+                        <ListboxOptions className="absolute  z-10 mt-1 w-full bg-white rounded border shadow max-h-60 overflow-y-auto">
                           {taskTypes.map((type) => (
                             <ListboxOption
                               key={type}
@@ -159,7 +159,7 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
                             >
                               {({ selected }) => (
                                 <>
-                                  <span>{type}</span>
+                                  <span className="text-[grey]">{type}</span>
                                   {selected && <CheckIcon className="h-4 w-4 text-green-600" />}
                                 </>
                               )}

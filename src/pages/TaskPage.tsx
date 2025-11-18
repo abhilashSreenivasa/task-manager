@@ -9,9 +9,10 @@ import RecentActivityItem from "../components/task/RecentActivityItem";
 import NotesInput from "../components/task/NotesInput";
 import RecordUpdateModal from "../components/task/RecordUpdateModal";
 import StepperHorizontal from "../components/task/StepperHorizontal";
-
+import owner from '../assets/Owner.png'
 import icon from "../assets/Icon.png";
 import groupIcon from "../assets/Group.png";
+import plus from "../assets/plus.png"
 
 function formatDate(dateString?: string) {
   if (!dateString) return "—";
@@ -148,11 +149,10 @@ export default function TaskPage() {
 
                 {/* OWNER CARD */}
                 <div
-                  className="flex items-center gap-2 bg-white p-2"
-                  style={{ borderRadius: 0 }}
+                  className="flex items-center gap-2 bg-white p-2 rounded"
                 >
                   <img
-                    src="https://ui-avatars.com/api/?name=Owner"
+                    src={owner}
                     className="h-8 w-8 rounded-full"
                   />
                   <div className="text-left">
@@ -235,7 +235,10 @@ export default function TaskPage() {
                   onClick={() => setShowRecordUpdate((v) => !v)}
                   className="bg-[#007F5F] text-white px-3 py-1.5 rounded text-sm"
                 >
-                  Record Update
+                  <div className="flex gap-1 items-center">
+                    <img src={plus} className="h-[16px] w-[16px]" />
+                    <p>Record Update</p>
+                  </div> 
                 </button>
 
                 {showRecordUpdate && (

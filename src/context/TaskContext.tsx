@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { getTaskList, createTask,updateTask } from "../services/taskService.mock";
+import { getTaskList, createTask } from "../services/taskService.mock";
 import type { Task,TaskNote } from "../types/Task";
 
 type TaskContextType = {
