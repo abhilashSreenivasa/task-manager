@@ -14,5 +14,4 @@ export const STATUS_TO_STEP: Record<string, number> = {
   "Sent to Provider": 4,
   Completed: 5,  // beyond last step → hide timeline
   Cancelled: 5,
-  "On Hold": 5,
 };

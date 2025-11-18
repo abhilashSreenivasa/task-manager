@@ -1,6 +1,6 @@
 // src/pages/TaskPage.tsx
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTaskContext } from "../context/TaskContext";
 import { Task } from "../types/Task";
 
@@ -8,6 +8,7 @@ import StatusTimeline from "../components/task/StatusTimeline";
 import RecentActivityItem from "../components/task/RecentActivityItem";
 import NotesInput from "../components/task/NotesInput";
 import RecordUpdateModal from "../components/task/RecordUpdateModal";
+import StepperHorizontal from "../components/task/StepperHorizontal";
 
 import icon from "../assets/Icon.png";
 import groupIcon from "../assets/Group.png";
@@ -28,6 +29,8 @@ export default function TaskPage() {
   const [task, setTask] = useState<Task | null>(null);
   const [noteInput, setNoteInput] = useState("");
   const [showRecordUpdate, setShowRecordUpdate] = useState(false);
+  const [leftColumnHeight, setLeftColumnHeight] = useState<number | null>(null);
+  const leftColumnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchTasks();
@@ -36,6 +39,19 @@ export default function TaskPage() {
   useEffect(() => {
     setTask(tasks.find((t) => t.id === Number(id)) || null);
   }, [tasks, id]);
+
+  useEffect(() => {
+    const updateHeight = () => {
+      if (leftColumnRef.current) {
+        setLeftColumnHeight(leftColumnRef.current.scrollHeight);
+      }
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    
+    return () => window.removeEventListener('resize', updateHeight);
+  }, [task]);
 
   if (loading) return <div className="p-6 text-center">Loading task...</div>;
 
@@ -71,33 +87,36 @@ export default function TaskPage() {
   return (
     <>
       <StatusTimeline status={task.status} />
-
+      
+      {(task.status ==="Completed"||task.status === "Cancelled") && <StepperHorizontal status={task.status}/>}
+      
       {/* MAIN WRAPPER */}
       <div
-        className="p-6 max-w-7xl mx-auto"
+        className="max-w-7xl mx-auto"
         style={{
           display: "flex",
           gap: 0,
-          maxHeight: "528px",   // <— fixes matching height
-          alignItems: "stretch",
+          height: leftColumnHeight ? `${leftColumnHeight}px` : 'auto',
+          alignItems: "flex-start",
         }}
       >
+        
         {/* ---------------- LEFT COLUMN ---------------- */}
         <div
+          ref={leftColumnRef}
           style={{
             flex: 1,
-            minHeight: 0, // REQUIRED for equal height + scroll
             display: "flex",
             flexDirection: "column",
+            width: '65%'
           }}
         >
           <div
-          className="bg-white shadow"
+            className="bg-white shadow"
             style={{
               flex: 1,
-              minHeight: 0,
-              overflowY: "auto",
-              WebkitOverflowScrolling: "touch",
+              display: "flex",
+              flexDirection: "column"
             }}
           >
             <div
@@ -144,6 +163,7 @@ export default function TaskPage() {
               </div>
 
               {/* YELLOW BOX */}
+              { (task.status !=="Completed" && task.status !== "Cancelled") && (
               <div className="bg-yellow-50 p-4 mt-4 text-sm text-gray-700">
                 <p className="font-semibold mb-1 text-left">
                   {daysSinceRequested}
@@ -169,6 +189,7 @@ export default function TaskPage() {
                     : "No attempts recorded yet"}
                 </div>
               </div>
+              )}
 
               {/* DESCRIPTION */}
               <div className="mt-3 text-left">
@@ -177,7 +198,7 @@ export default function TaskPage() {
                   <img src={icon} className="h-[16px] w-[16px]" />
                 </div>
 
-                <div className="bg-gray-100 p-4 text-[#909090] min-h-[166px] mt-1">
+                <div className="flex flex-1 bg-gray-100 p-4 text-[#909090] min-h-[166px] mt-1">
                   {task.description || "No description provided."}
                 </div>
               </div>
@@ -188,11 +209,11 @@ export default function TaskPage() {
         {/* ---------------- RIGHT COLUMN ---------------- */}
         <div
           style={{
-            width: "320px",
+            width: "35%",
             flexShrink: 0,
             display: "flex",
             flexDirection: "column",
-            minHeight: 0, // ensures it matches height + scrolls within
+            height: leftColumnHeight ? `${leftColumnHeight}px` : 'auto',
           }}
         >
           <div
@@ -202,7 +223,7 @@ export default function TaskPage() {
               flex: 1,
               display: "flex",
               flexDirection: "column",
-              minHeight: 0,
+              height: '100%',
             }}
           >
             {/* HEADER */}

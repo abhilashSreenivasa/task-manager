@@ -6,8 +6,9 @@
   padding: 2rem;
   text-align: center;
 }
-
-* FORCE OVERLAY SCROLLBARS (Chrome, Edge, Safari) */
+html{
+  background-color: rgb(226, 229, 229);
+}
 .scroll-overlay {
   overflow-y: auto;
 }
