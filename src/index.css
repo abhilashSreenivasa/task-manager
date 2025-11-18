@@ -5,12 +5,14 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Changed background-color to light grey for dark scheme */
+  background-color: #ad7474; 
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
 }
 
 a {
@@ -57,7 +59,8 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #817f7f;
+    /* Changed background-color to light grey for light scheme */
+    background-color: #D3D3D3; 
   }
   a:hover {
     color: #747bff;
@@ -65,4 +68,31 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+/* FORCE OVERLAY SCROLLBARS (Chrome, Edge, Safari) */
+.scroll-overlay {
+  overflow-y: auto;
+}
+
+/* Make scrollbar overlay (not affect layout) */
+.scroll-overlay::-webkit-scrollbar {
+  width: 8px;
+  position: absolute;
+}
+.scroll-overlay::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-overlay::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.3);
+  border-radius: 4px;
+}
+
+/* Hide scrollbar until scroll happens */
+.scroll-overlay::-webkit-scrollbar-thumb:vertical:inactive {
+  background: transparent;
+}
+
+/* Disable scrollbar gutter reservation */
+.scroll-overlay {
+  scrollbar-gutter: none !important;
 }

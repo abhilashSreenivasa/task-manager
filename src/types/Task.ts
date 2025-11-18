@@ -4,6 +4,7 @@ export interface TaskNote {
   author: string;
   createdAt: string;
   updatedAt: string;
+  kind?: "note" | "update" | "nextAction";
 }
 
 export interface Task {
@@ -32,4 +33,5 @@ export interface Task {
 
   // activity pane
   notes: TaskNote[];
+  
 }

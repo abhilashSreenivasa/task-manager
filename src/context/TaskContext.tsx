@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { getTaskList, createTask,updateTask } from "../services/taskService.mock";
-import type { Task } from "../types/Task";
+import type { Task,TaskNote } from "../types/Task";
 
 type TaskContextType = {
   tasks: Task[];
@@ -9,12 +9,12 @@ type TaskContextType = {
   fetchTasks: () => Promise<void>;
   createNewTask: (taskData: any) => Promise<void>;
   addNote: (taskId: number, body: string) => void;
-   recordUpdate: (
+  recordUpdate: (
     taskId: number,
     status: string,
     nextActionDate: string,
     nextActionNotes: string
-  ) => void;  
+  ) => void;
 };
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -80,19 +80,57 @@ const recordUpdate = (
   nextActionNotes: string
 ) => {
   setTasks((prev) =>
-    prev.map((t) =>
-      t.id === taskId
-        ? {
-            ...t,
-            status,
-            nextActionDate,
-            nextActionNotes,
-            lastUpdated: new Date().toISOString(),
-          }
-        : t
-    )
+    prev.map((t) => {
+      if (t.id !== taskId) return t;
+
+      const notesToAdd: TaskNote[] = [];
+
+      // --- STATUS UPDATE ---
+      // Add note ONLY if:
+      //   • status exists
+      //   • status is not "Requested"
+      if (status && status.trim() && status !== "Requested") {
+        notesToAdd.push({
+          id: Date.now() + 1,
+          body: `Updated status to ${status}`,
+          author: t.ownerName || "Owner",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          kind: "update",
+        });
+      }
+
+      // --- NEXT ACTION UPDATE ---
+      // Add ONLY if nextActionDate is provided.
+      // nextActionNotes alone is invalid → skip entirely.
+      if (nextActionDate && nextActionDate.trim()) {
+        notesToAdd.push({
+          id: Date.now() + 2,
+          body: `Next action date: ${nextActionDate}`,
+          author: t.ownerName || "Owner",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          kind: "nextAction",
+        });
+      }
+
+      // If user didn't set ANY valid fields → do NOT update
+      if (notesToAdd.length === 0) {
+        return t;
+      }
+
+      return {
+        ...t,
+        status: status || t.status,
+        nextActionDate: nextActionDate || t.nextActionDate,
+        nextActionNotes: nextActionNotes || t.nextActionNotes,
+        notes: [...(t.notes || []), ...notesToAdd],
+        lastUpdated: new Date().toISOString(),
+      };
+    })
   );
 };
+
 
 
   

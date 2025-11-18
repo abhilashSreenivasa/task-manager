@@ -1,80 +1,72 @@
+import type { TaskNote } from "../../types/Task";
 
-interface RecentActivityItemProps {
-  userName?: string;
-  activityDescription?: string;
-  noteContent?: string;
-  timestamp?: string;
+// helper: format timestamp "HH:MM, DD/MM/YYYY"
+function formatTimestamp(iso?: string) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mmn = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${hh}:${mm}, ${dd}/${mmn}/${yyyy}`;
 }
 
-export default function RecentActivityItem({
-  userName = "Adam Wais",
-  activityDescription = "Added a new note.",
-  noteContent = "New note comes here",
-  timestamp = "6:00 PM, 04/08/2025"
-}: RecentActivityItemProps) {
-  
-  // Color logic
-  const color =
-    userName === "Adam Wais" ? "#BCA105" : "#007F5F"; // adjust if needed
+interface Props {
+  note: TaskNote;
+}
+
+export default function RecentActivityItem({ note }: Props) {
+  const { author, body, createdAt, kind } = note;
 
   return (
-    <div className="flex gap-2 items-start text-xs leading-none">
+    <div className="relative flex gap-2 items-start text-xs leading-none w-full min-w-0 mt-1">
 
-      {/* LEFT TIMELINE COLUMN */}
-      <div className="flex flex-col items-center mt-1">
-
-        {/* CIRCLE */}
+      {/* Left: dot + line */}
+      <div className="flex flex-col items-center pt-1">
         <div
-          className="rounded-full"
-          style={{
-            width: "6px",
-            height: "6px",
-            backgroundColor: color
-          }}
+          style={{ width: 6, height: 6, borderRadius: 999, background: "#BCA105" }}
         />
-
-        {/* VERTICAL LINE */}
         <div
           style={{
-            width: "1px",
-            height: "35px",
-            backgroundColor: color,
-            opacity: 0.8,
-            marginTop: "4px"
+            width: 1,
+            background: "#BCA105",
+            height: 36,
+            marginTop: 8,
+            opacity: 0.35,
           }}
         />
       </div>
 
-      {/* RIGHT CONTENT (YOUR EXISTING UI) */}
-      <div className="flex flex-1 shrink gap-2 items-start w-full rounded-lg basis-0 min-w-60">
+      {/* Right side */}
+      <div className="flex-1 flex flex-col min-w-0">
 
-        <div className="flex-1 shrink basis-0 min-w-60">
-          <div className="flex gap-1 items-start w-full font-semibold">
-            <div className="flex gap-1 items-center text-yellow-600">
-              <div className="self-stretch my-auto">
-                {userName}
-              </div>
-            </div>
-            <div className="text-zinc-700">
-              {activityDescription}
-            </div>
+        {/* Row with author + text */}
+        <div className="flex gap-2 items-start min-w-0">
+          <div className="font-semibold text-[12px] text-[#BCA105] whitespace-nowrap">
+            {author}
           </div>
 
-          <div className="mt-1 w-full text-zinc-700">
-            <div className="flex flex-col justify-center items-start px-3.5 py-2.5 bg-lime-50 rounded-lg border-b border-stone-300">
-              <div className="text-zinc-700">
-                {noteContent}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-1 items-center mt-1 w-full text-zinc-500">
-            <div className="self-stretch my-auto">
-              {timestamp}
-            </div>
+          <div className="text-[12px] break-words min-w-0">
+            {kind === "update" && <strong>{body}</strong>}
+            {kind === "nextAction" && <strong>{body}</strong>}
+            {(!kind || kind === "note") && <strong>Added a new note.</strong>}
           </div>
         </div>
 
+        {/* Note content (for note only) */}
+        {(!kind || kind === "note") && (
+          <div className="mt-2 text-left">
+            <div className="px-1 py-1 bg-lime-50 rounded-lg border border-stone-200 text-sm text-zinc-700 break-words">
+              {body}
+            </div>
+          </div>
+        )}
+
+        {/* Timestamp */}
+        <div className="mt-2 text-xs w-full text-left">
+          {formatTimestamp(createdAt)}
+        </div>
       </div>
     </div>
   );
