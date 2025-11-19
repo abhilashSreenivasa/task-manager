@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useState, ReactNode } from "react";
 import { getTaskList, createTask } from "../services/taskService.mock";
 import type { Task,TaskNote } from "../types/Task";
 
@@ -41,7 +41,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     try {
       setLoading(true);
       await createTask(taskData);
-      await fetchTasks(); // refresh after creation
+      await fetchTasks();
     } catch (err) {
       console.error(err);
       setError("Failed to create task");
@@ -152,8 +152,5 @@ const recordUpdate = (
   );
 };
 
-export const useTaskContext = () => {
-  const ctx = useContext(TaskContext);
-  if (!ctx) throw new Error("useTaskContext must be used within TaskProvider");
-  return ctx;
-};
+// Export the context for the custom hook to use
+export { TaskContext };
