@@ -64,7 +64,7 @@ export default function RecentActivityItem({ note }: Props) {
         )}
 
         {/* Timestamp */}
-        <div className="mt-2 text-xs w-full text-left">
+        <div className="mt-2 text-xs w-full text-left text-[grey]">
           {formatTimestamp(createdAt)}
         </div>
       </div>
