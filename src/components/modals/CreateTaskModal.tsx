@@ -1,16 +1,19 @@
-import { Dialog,DialogPanel, Transition, TransitionChild, Listbox,ListboxButton,ListboxOption,ListboxOptions } from "@headlessui/react";
+import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
 import { Fragment, useState } from "react";
-import { ChevronUpDownIcon, CheckIcon, XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { clients } from "../../constants/clients";
 import { owners } from "../../constants/owners";
 import { taskTypes } from "../../constants/taskTypes";
+import ModalHeader from "../ui/ModalHeader";
+import FormListBox from "../ui/FormListBox";
+import FormTextArea from "../ui/FormTextArea";
+import FormCheckBox from "../ui/FormCheckBox";
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onCreate: (data: any) => void;
 }
-
-
 
 export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
   const [selectedClient, setSelectedClient] = useState(clients[0]);
@@ -21,20 +24,18 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
   const [assignQueue, setAssignQueue] = useState(false);
 
   const handleSubmit = () => {
-  onCreate({
-    PersonId: selectedClient.id,
-    clientName: selectedClient.name,
-    OwnerId: selectedOwner.id,
-    ownerName: selectedOwner.name,
-    TaskType: selectedTaskType,
-    Description: description,
-    IsUrgent: urgent,
-    IsAssignedToQueue: assignQueue,
-  });
-
-  onClose();
-};
-
+    onCreate({
+      PersonId: selectedClient.id,
+      clientName: selectedClient.name,
+      OwnerId: selectedOwner.id,
+      ownerName: selectedOwner.name,
+      TaskType: selectedTaskType,
+      Description: description,
+      IsUrgent: urgent,
+      IsAssignedToQueue: assignQueue,
+    });
+    onClose();
+  };
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -67,15 +68,11 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
             <DialogPanel className="w-full max-w-3xl rounded-lg bg-white shadow-lg overflow-hidden">
 
               {/* HEADER */}
-              <div className="bg-[#918563] px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-white">
-                  <PlusIcon className="h-5 w-5" />
-                  <span className="font-medium">Create New Task</span>
-                </div>
-                <button onClick={onClose}>
-                  <XMarkIcon className="h-5 w-5 text-white" />
-                </button>
-              </div>
+              <ModalHeader
+                title="Create New Task"
+                icon={<PlusIcon className="h-5 w-5" />}
+                onClose={onClose}
+              />
 
               {/* CONTENT */}
               <div className="p-6 space-y-6">
@@ -84,124 +81,54 @@ export default function CreateTaskModal({ isOpen, onClose, onCreate }: Props) {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   
                   {/* CLIENT */}
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Client</label>
-                    <Listbox value={selectedClient} onChange={setSelectedClient}>
-                      <div className="relative">
-                        <ListboxButton className="w-full border border rounded px-3 py-2 flex justify-between items-center text-left">
-                          <span className="text-[grey]">{selectedClient.name}</span>
-                          <ChevronUpDownIcon className="h-5 w-5 text-gray-500" />
-                        </ListboxButton>
-                        <ListboxOptions className="absolute z-10 mt-1 w-full bg-white rounded border shadow">
-                          {clients.map((client) => (
-                            <ListboxOption
-                              key={client.id}
-                              value={client}
-                              className="cursor-pointer px-3 py-2 hover:bg-gray-100 flex items-center justify-between"
-                            >
-                              {({ selected }) => (
-                                <>
-                                  <span className="text-[grey]">{client.name}</span>
-                                  {selected && <CheckIcon className="h-4 w-4 text-green-600" />}
-                                </>
-                              )}
-                            </ListboxOption>
-                          ))}
-                        </ListboxOptions>
-                      </div>
-                    </Listbox>
-                  </div>
+                  <FormListBox
+                    label="Client"
+                    value={selectedClient}
+                    onChange={setSelectedClient}
+                    options={clients}
+                    displayValue={(client) => client.name}
+                  />
 
                   {/* TASK OWNER */}
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Task Owner</label>
-                    <Listbox value={selectedOwner} onChange={setSelectedOwner}>
-                      <div className="relative">
-                        <ListboxButton className="w-full border rounded px-3 py-2 flex justify-between items-center text-left">
-                          <span className="text-[grey]">{selectedOwner.name}</span>
-                          <ChevronUpDownIcon className="h-5 w-5 text-gray-500" />
-                        </ListboxButton>
-                        <ListboxOptions className="absolute z-10 mt-1 w-full bg-white rounded border shadow">
-                          {owners.map((owner) => (
-                            <ListboxOption
-                              key={owner.id}
-                              value={owner}
-                              className="cursor-pointer px-3 py-2 hover:bg-gray-100 flex items-center justify-between"
-                            >
-                              {({ selected }) => (
-                                <>
-                                  <span className="text-[grey]">{owner.name}</span>
-                                  {selected && <CheckIcon className="h-4 w-4 text-green-600" />}
-                                </>
-                              )}
-                            </ListboxOption>
-                          ))}
-                        </ListboxOptions>
-                      </div>
-                    </Listbox>
-                  </div>
+                  <FormListBox
+                    label="Task Owner"
+                    value={selectedOwner}
+                    onChange={setSelectedOwner}
+                    options={owners}
+                    displayValue={(owner) => owner.name}
+                  />
 
                   {/* TASK TYPE */}
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Task Type</label>
-                    <Listbox value={selectedTaskType} onChange={setSelectedTaskType}>
-                      <div className="relative">
-                        <ListboxButton className="w-full border rounded px-3 py-2 flex justify-between items-center text-left">
-                          <span className="text-[grey]">{selectedTaskType}</span>
-                          <ChevronUpDownIcon className="h-5 w-5 text-gray-500" />
-                        </ListboxButton>
-                        <ListboxOptions className="absolute  z-10 mt-1 w-full bg-white rounded border shadow max-h-60 overflow-y-auto">
-                          {taskTypes.map((type) => (
-                            <ListboxOption
-                              key={type}
-                              value={type}
-                              className="cursor-pointer px-3 py-2 hover:bg-gray-100 flex items-center justify-between"
-                            >
-                              {({ selected }) => (
-                                <>
-                                  <span className="text-[grey]">{type}</span>
-                                  {selected && <CheckIcon className="h-4 w-4 text-green-600" />}
-                                </>
-                              )}
-                            </ListboxOption>
-                          ))}
-                        </ListboxOptions>
-                      </div>
-                    </Listbox>
-                  </div>
+                  <FormListBox
+                    label="Task Type"
+                    value={selectedTaskType}
+                    onChange={setSelectedTaskType}
+                    options={taskTypes}
+                    displayValue={(type) => type}
+                  />
 
                 </div>
 
                 {/* DESCRIPTION */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">Task Description</label>
-                  <textarea
-                    className="w-full border rounded p-3 min-h-[120px]"
-                    placeholder="Please add all details for administration to complete the task"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
+                <FormTextArea
+                  label="Task Description"
+                  value={description}
+                  onChange={setDescription}
+                  placeholder="Please add all details for administration to complete the task"
+                />
 
                 {/* CHECKBOXES */}
                 <div className="flex items-center gap-6">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={urgent}
-                      onChange={(e) => setUrgent(e.target.checked)}
-                    />
-                    <span>Mark as Urgent</span>
-                  </label>
-
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={assignQueue}
-                      onChange={(e) => setAssignQueue(e.target.checked)}
-                    />
-                    <span>Assign to Queue</span>
-                  </label>
+                  <FormCheckBox
+                    label="Mark as Urgent"
+                    checked={urgent}
+                    onChange={setUrgent}
+                  />
+                  <FormCheckBox
+                    label="Assign to Queue"
+                    checked={assignQueue}
+                    onChange={setAssignQueue}
+                  />
                 </div>
 
                 {/* FOOTER */}

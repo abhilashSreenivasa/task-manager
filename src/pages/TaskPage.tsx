@@ -1,14 +1,24 @@
 // src/pages/TaskPage.tsx
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import { useTaskContext } from "../context/TaskContext";
+import { useTaskContext } from "../hooks/useTaskContext";
 import { Task } from "../types/Task";
 
+// Task-specific components
 import StatusTimeline from "../components/task/StatusTimeline";
-import RecentActivityItem from "../components/task/RecentActivityItem";
-import NotesInput from "../components/task/NotesInput";
-import RecordUpdateModal from "../components/task/RecordUpdateModal";
 import StepperHorizontal from "../components/task/StepperHorizontal";
+
+// New task components
+import TaskHeader from "../components/task/TaskHeader";
+import TaskAlertBox from "../components/task/TaskAlertBox";
+import TaskDescription from "../components/task/TaskDescription";
+import ActivitySection from "../components/task/ActivitySection";
+
+// UI components
+import OwnerCard from "../components/ui/OwnerCard";
+import UrgentBadge from "../components/ui/UrgentBadge";
+
+// Assets
 import owner from '../assets/Owner.png'
 import icon from "../assets/Icon.png";
 import groupIcon from "../assets/Group.png";
@@ -129,161 +139,58 @@ export default function TaskPage() {
               style={{ borderRadius: 0 }}
             >
               {/* TOP ROW */}
-              <div className="flex items-start justify-between">
-                <div className="flex flex-col gap-2">
-                  <div className="flex gap-2">
-                    <h1 className="text-2xl font-semibold">{task.taskName}</h1>
-
-                    {task.isUrgent && (
-                      <div className="flex gap-2 bg-[#D53C32] text-white pl-2 pr-2 items-center rounded">
-                        <img src={groupIcon} className="w-3 h-3" />
-                        <p>Urgent</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <p className="text-[#134648] mt-1">
-                    {task.taskType} for {task.clientName}
-                  </p>
-                </div>
-
-                {/* OWNER CARD */}
-                <div
-                  className="flex items-center gap-2 bg-white p-2 rounded"
-                >
-                  <img
-                    src={owner}
-                    className="h-8 w-8 rounded-full"
+              <TaskHeader 
+                task={task}
+                ownerCard={
+                  <OwnerCard 
+                    avatar={owner}
+                    name={task.ownerName}
+                    role="Owner"
+                    accentColor="#BCA105"
                   />
-                  <div className="text-left">
-                    <p className="font-medium text-[#BCA105]">{task.ownerName}</p>
-                    <p className="text-xs text-gray-500">Owner</p>
-                  </div>
-                </div>
-              </div>
+                }
+                urgentBadge={
+                  task.isUrgent && (
+                    <UrgentBadge 
+                      icon={groupIcon}
+                      text="Urgent"
+                    />
+                  )
+                }
+              />
 
-              {/* YELLOW BOX */}
+              {/* ALERT BOX */}
               { (task.status !=="Completed" && task.status !== "Cancelled") && (
-              <div className="bg-yellow-50 p-4 mt-4 text-sm text-gray-700">
-                <p className="font-semibold mb-1 text-left">
-                  {daysSinceRequested}
-                  <span className="text-[#909090] text-sm"> days since requested</span>
-                </p>
-
-                <div className="flex flex-col text-left gap-2 px-4 py-2 rounded-lg border-l-2 bg-[#F6F2E5]">
-                  <p>
-                    <span className="font-semibold text-[#909090]">
-                      Next Action on:
-                    </span>{" "}
-                    {task.nextActionDate ? formatDate(task.nextActionDate) : "—"}
-                  </p>
-
-                  <p className="text-sm text-[#666]">
-                    {task.nextActionNotes || "No next action notes yet"}
-                  </p>
-                </div>
-
-                <div className="mt-2 text-xs text-gray-500">
-                  {task.lastUpdated
-                    ? `Attempt Recorded on ${formatDate(task.lastUpdated)}`
-                    : "No attempts recorded yet"}
-                </div>
-              </div>
+                <TaskAlertBox 
+                  daysSinceRequested={daysSinceRequested}
+                  nextActionDate={task.nextActionDate}
+                  nextActionNotes={task.nextActionNotes}
+                  lastUpdated={task.lastUpdated}
+                  formatDate={formatDate}
+                />
               )}
 
               {/* DESCRIPTION */}
-              <div className="mt-3 text-left">
-                <div className="flex gap-[8px] items-center">
-                  <p className="text-[14px]">Task Description</p>
-                  <img src={icon} className="h-[16px] w-[16px]" />
-                </div>
-
-                <div className="flex flex-1 bg-gray-100 p-4 text-[#909090] min-h-[166px] mt-1">
-                  {task.description || "No description provided."}
-                </div>
-              </div>
+              <TaskDescription 
+                description={task.description}
+                icon={icon}
+              />
             </div>
           </div>
         </div>
 
         {/* ---------------- RIGHT COLUMN ---------------- */}
-        <div
-          style={{
-            width: "35%",
-            flexShrink: 0,
-            display: "flex",
-            flexDirection: "column",
-            height: leftColumnHeight ? `${leftColumnHeight}px` : 'auto',
-          }}
-        >
-          <div
-            className="bg-white shadow p-4"
-            style={{
-              borderRadius: 0,
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              height: '100%',
-            }}
-          >
-            {/* HEADER */}
-            <div className="flex items-center justify-between mb-3 relative" style={{ flexShrink: 0 }}>
-              <h3 className="font-semibold text-gray-700">Recent Activity</h3>
-
-              <div className="relative">
-                <button
-                  onClick={() => setShowRecordUpdate((v) => !v)}
-                  className="bg-[#007F5F] text-white px-3 py-1.5 rounded text-sm"
-                >
-                  <div className="flex gap-1 items-center">
-                    <img src={plus} className="h-[16px] w-[16px]" />
-                    <p>Record Update</p>
-                  </div> 
-                </button>
-
-                {showRecordUpdate && (
-                  <div className="absolute right-0 mt-2 z-50">
-                    <RecordUpdateModal
-                      isOpen={showRecordUpdate}
-                      onClose={() => setShowRecordUpdate(false)}
-                      onSave={handleRecordUpdateSave}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* ADD NOTE */}
-            <div style={{ flexShrink: 0 }}>
-              <NotesInput
-                value={noteInput}
-                onChange={setNoteInput}
-                onSend={handleAddNote}
-              />
-            </div>
-
-            <hr className="my-4" style={{ flexShrink: 0 }} />
-
-            {/* RIGHT SCROLL AREA */}
-            <div
-              style={{
-                flex: 1,
-                minHeight: 0,
-                overflowY: "auto",
-                paddingRight: 6,
-                WebkitOverflowScrolling: "touch",
-              }}
-            >
-              {task.notes?.length ? (
-                task.notes.map((note) => (
-                  <RecentActivityItem key={note.id} note={note} />
-                ))
-              ) : (
-                <div className="text-center text-gray-500 py-6">No activity yet.</div>
-              )}
-            </div>
-          </div>
-        </div>
+        <ActivitySection
+          task={task}
+          noteInput={noteInput}
+          onNoteInputChange={setNoteInput}
+          onAddNote={handleAddNote}
+          showRecordUpdate={showRecordUpdate}
+          onShowRecordUpdateChange={setShowRecordUpdate}
+          onRecordUpdateSave={handleRecordUpdateSave}
+          leftColumnHeight={leftColumnHeight}
+          plusIcon={plus}
+        />
       </div>
     </>
   );
